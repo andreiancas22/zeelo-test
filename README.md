@@ -2,6 +2,7 @@
 
 ## Overview
 
+--
 This repository contains **TaskFlow**, a simple task management web app, along with an existing test suite and an incomplete CI/CD pipeline.
 
 The development team is frustrated that their tickets keep coming back as failed QA after they have merged their changes and have asked the test platform team to run the UI tests on Pull request. They do not always remember to run them manual and have also expressed their frustration that the tests take too long to run and keep failing intermittently.
