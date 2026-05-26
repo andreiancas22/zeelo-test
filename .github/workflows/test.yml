@@ -9,6 +9,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Cache Playwright Docker image
+        id: cache-playwright
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/docker/playwright.tar
+          key: playwright-image-v1.60.0-noble
+
+      - name: Load cached Playwright image
+        if: steps.cache-playwright.outputs.cache-hit == 'true'
+        run: docker load -i ~/.cache/docker/playwright.tar
+
+      - name: Pull and cache Playwright image
+        if: steps.cache-playwright.outputs.cache-hit != 'true'
+        run: |
+          docker pull mcr.microsoft.com/playwright:v1.60.0-noble
+          mkdir -p ~/.cache/docker
+          docker save mcr.microsoft.com/playwright:v1.60.0-noble -o ~/.cache/docker/playwright.tar
+
       - name: Build app image
         run: docker compose build app
 
