@@ -1,14 +1,8 @@
-import { test, expect } from "@playwright/test";
-import { login, addTaskViaUI } from "./helpers/test-utils";
+import { test, expect } from "./fixtures";
+import { addTaskViaUI } from "./helpers/test-utils";
 
 test.describe("Task Management", () => {
-  test.beforeEach(async ({ page }) => {
-    // Reset task data before each test
-    await page.request.post("/api/reset");
-    await login(page);
-  });
-
-  test("should add a new task", async ({ page }) => {
+  test("should add a new task", async ({ authenticatedPage: page }) => {
     await addTaskViaUI(page, "Buy groceries", "medium");
 
     const taskItem = page.locator("ul#task-list > li");
@@ -16,27 +10,28 @@ test.describe("Task Management", () => {
     await expect(taskItem.locator("span:nth-child(2)")).toHaveText("Buy groceries");
   });
 
-  test("should mark a task as completed", async ({ page }) => {
+  test("should mark a task as completed", async ({ authenticatedPage: page }) => {
     await addTaskViaUI(page, "Test task");
 
-    await page.locator(".task-item input[type='checkbox']").click();
-    expect(
-      await page.locator(".task-item").getAttribute("class")
-    ).toContain("completed");
+    const taskItem = page.locator(".task-item", { hasText: "Test task" });
+    await taskItem.locator("input[type='checkbox']").click();
+    await expect(taskItem).toHaveClass(/completed/);
   });
 
-  test("should delete a task", async ({ page }) => {
-    await addTaskViaUI(page, "Task to delete");
-    await expect(page.locator("ul > li")).toHaveCount(1);
+  test("should delete a task", async ({ authenticatedPage: page }) => {
+    const title = "Task to delete";
+    await addTaskViaUI(page, title);
 
-    await page.locator("ul > li > button:last-child").click();
-    await expect(page.locator("ul > li")).toHaveCount(0);
+    await page.locator(".task-item", { hasText: title }).getByLabel("Delete task").click();
+    await expect(page.getByText(title)).not.toBeVisible();
   });
 
-  test("should display correct task count", async ({ page }) => {
-    await addTaskViaUI(page, "Task 1");
-    await addTaskViaUI(page, "Task 2");
-    await addTaskViaUI(page, "Task 3");
+  test("should display correct task count", async ({ authenticatedPage: page }) => {
+    const tasks = ["Task 1", "Task 2", "Task 3"];
+
+    for (const task of tasks) {
+      await addTaskViaUI(page, task);
+    }
 
     await expect(page.locator("#task-count")).toHaveText(
       "3 of 3 tasks remaining"
