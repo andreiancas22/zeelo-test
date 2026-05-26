@@ -1,17 +1,24 @@
-name: Test Suite
+name: Playwright Tests
 
 on:
-  push:
-    branches: [main]
   pull_request:
-    branches: [main]
 
 jobs:
-  test:
+  build-and-test:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: npm install
+      - name: Build app image
+        run: docker compose build app
+
+      - name: Run tests
+        run: docker compose run --rm tests
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pw-report
+          path: playwright-report/
+          retention-days: 7

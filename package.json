@@ -6,14 +6,15 @@
     "test": "npx playwright test",
     "docker:up": "docker compose up -d --build",
     "docker:down": "docker compose down",
-    "docker:wait": "npx wait-on http://localhost:3000/health --timeout 30000"
+    "docker:wait": "npx wait-on http://localhost:3000/health --timeout 30000",
+    "postinstall": "npx playwright install"
   },
   "dependencies": {
     "express": "^4.21.0",
     "express-session": "^1.18.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.59.0",
-    "wait-on": "^8.0.0"
+    "@playwright/test": "1.60.0",
+    "wait-on": "8.0.0"
   }
 }

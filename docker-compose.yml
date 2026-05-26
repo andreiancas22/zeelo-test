@@ -1,8 +1,22 @@
 services:
   app:
     build: .
+    image: node:20-alpine
     ports:
       - "3000:3000"
     environment:
       - PORT=3000
       - NODE_ENV=test
+
+  tests:
+    image: mcr.microsoft.com/playwright:v1.60.0-noble
+    network_mode: "service:app"
+    working_dir: /app
+    volumes:
+      - .:/app
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      - BASE_URL=http://localhost:3000
+    command: npx playwright test
