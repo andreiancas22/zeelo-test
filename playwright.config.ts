@@ -3,14 +3,16 @@ import { defineConfig, devices } from "@playwright/test";
 export default defineConfig({
   testDir: "./tests",
   timeout: 30_000,
-  workers: process.env.CI ? "100%" : "50%",
+  workers: "50%",
   reporter: [['line'], ['html']],
+  forbidOnly: !!process.env.CI,
+  maxFailures: process.env.CI ? 10 : undefined,
+  expect: { timeout: 5000 },
   retries: process.env.CI ? 1 : 0,
   use: {
     baseURL: process.env.BASE_URL || "http://localhost:3000",
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
-    video: "retain-on-failure",
     ignoreHTTPSErrors: true,
     headless: true,
     viewport: { width: 1280, height: 720 },

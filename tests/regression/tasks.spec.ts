@@ -1,5 +1,5 @@
-import { test, expect } from "./fixtures";
-import { addTaskViaUI } from "./helpers/test-utils";
+import { test, expect } from "@fixtures";
+import { addTaskViaUI } from "@helpers/test-utils";
 
 test.describe("Task Management", () => {
   test("should add a new task", async ({ authenticatedPage: page }) => {
@@ -36,5 +36,36 @@ test.describe("Task Management", () => {
     await expect(page.locator("#task-count")).toHaveText(
       "3 of 3 tasks remaining"
     );
+  });
+
+  test("should mark a completed task as incomplete", async ({ authenticatedPage: page }) => {
+    await addTaskViaUI(page, "Toggle task");
+
+    const taskItem = page.locator(".task-item", { hasText: "Toggle task" });
+    const checkbox = taskItem.locator("input[type='checkbox']");
+
+    await checkbox.click();
+    await expect(taskItem).toHaveClass(/completed/);
+
+    await checkbox.click();
+    await expect(taskItem).not.toHaveClass(/completed/);
+  });
+
+  test("should render priority badges for all priorities", async ({ authenticatedPage: page }) => {
+    await addTaskViaUI(page, "Low task", "low");
+    await addTaskViaUI(page, "Medium task", "medium");
+    await addTaskViaUI(page, "High task", "high");
+
+    const badgeFor = (title: string) =>
+      page.locator(".task-item", { hasText: title }).locator(".priority-badge");
+
+    await expect(badgeFor("Low task")).toHaveClass(/low/);
+    await expect(badgeFor("Low task")).toHaveText("low");
+
+    await expect(badgeFor("Medium task")).toHaveClass(/medium/);
+    await expect(badgeFor("Medium task")).toHaveText("medium");
+
+    await expect(badgeFor("High task")).toHaveClass(/high/);
+    await expect(badgeFor("High task")).toHaveText("high");
   });
 });

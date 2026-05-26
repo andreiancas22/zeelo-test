@@ -33,10 +33,20 @@ jobs:
       - name: Run tests
         run: docker compose run --rm tests
 
-      - name: Upload test results
+      - name: Upload Playwright HTML report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: pw-report
           path: playwright-report/
           retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Upload Playwright traces, videos & screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pw-test-results
+          path: test-results/
+          retention-days: 7
+          if-no-files-found: ignore
