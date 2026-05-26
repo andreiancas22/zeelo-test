@@ -23,6 +23,6 @@ test.describe("Authentication", () => {
     await page.fill("#username", "wronguser");
     await page.fill("#password", "wrongpass");
     await page.click("#login-btn");
-    await expect(page.locator("#error")).toBeVisible();
+    await expect(page.getByText("Invalid username or password.")).toBeVisible();
   });
 });

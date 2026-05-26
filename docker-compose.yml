@@ -19,4 +19,4 @@ services:
         condition: service_healthy
     environment:
       - BASE_URL=http://localhost:3000
-    command: npx playwright test
+    command: sh -c "npm ci --ignore-scripts && npx playwright test"

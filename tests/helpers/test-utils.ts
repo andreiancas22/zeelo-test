@@ -1,19 +1,7 @@
-import { Page } from "@playwright/test";
+import { Page, expect } from "@playwright/test";
 
 /**
- * Logs in via the UI.
- * Used by all tests to authenticate before running.
- */
-export async function login(page: Page) {
-  await page.goto("/login");
-  await page.fill("#username", "admin");
-  await page.fill("#password", "admin123");
-  await page.click("#login-btn");
-  await page.waitForURL("/");
-}
-
-/**
- * Adds a task via the UI.
+ * Adds a task via the UI and waits for it to appear in the list.
  */
 export async function addTaskViaUI(
   page: Page,
@@ -22,6 +10,6 @@ export async function addTaskViaUI(
 ) {
   await page.fill(".form-row > input:first-child", title);
   await page.selectOption(".form-row > select", priority);
-  await page.click(".form-row > button");
-  await page.waitForTimeout(1000);
+  await page.getByRole("button", { name: "Add Task" }).click();
+  await expect(page.locator(".task-item", { hasText: title })).toBeVisible();
 }
